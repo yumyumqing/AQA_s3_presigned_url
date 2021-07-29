@@ -46,6 +46,12 @@ This takes several minutes to deploy. At the end of the deployment, note the out
 - The APIendpoint value is important - it looks like https://ab123345677.execute-api.us-west-2.amazonaws.com.
 - **The upload URL is your endpoint** with the /uploads route added - for example: https://ab123345677.execute-api.us-west-2.amazonaws.com/uploads.
 
+### Testing with Postman
+
+1. First, copy the API endpoint from the output of the deployment.
+   https://glxlp92kil.execute-api.us-west-2.amazonaws.com/uploads
+2. In the Postman interface, paste the API endpoint into the box labeled Enter request URL, select GET, add video as binary raw file.
+3. Send
 
 ### Testing with the frontend application
 
