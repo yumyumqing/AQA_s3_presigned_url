@@ -1,3 +1,5 @@
+This repo is based on https://github.com/aws-samples/amazon-s3-presigned-urls-aws-sam
+
 # S3 presigned URLs with SAM, auth and sample frontend
 
 This example application shows how to upload objects to S3 directly from your end-user application using Signed URLs.
