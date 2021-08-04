@@ -27,7 +27,7 @@ Resources:
     Properties:
       CodeUri: getSignedURL/
       Handler: app.handler
-      Runtime: nodejs12.x
+      Runtime: python3.8
       Timeout: 3
       MemorySize: 128
       Environment:
