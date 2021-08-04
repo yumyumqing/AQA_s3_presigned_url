@@ -36,7 +36,7 @@ def handler(event, context):
         logger.info(
             f"Getting a presigned URL for object {video_key} in bucket: {bucket}"
         )
-        response_url = create_presigned_url(region, bucket, video_key)
+        response_url = create_presigned_url(region, bucket, video_key, video_type)
         if not response_url:
             raise ("Failed to get a presigned URL")
 
@@ -50,22 +50,32 @@ def handler(event, context):
         raise e
 
 
-def create_presigned_url(region_name, bucket_name, object_name, expiration=3600):
-    """Generate a presigned URL to share an S3 object
+def create_presigned_url(
+    region_name, bucket_name, object_name, object_type, expiration=3600
+):
+    """Generate a presigned URL to PUT an S3 object
 
     :param bucket_name: string
     :param object_name: string
+    :param object_type: string
     :param expiration: Time in seconds for the presigned URL to remain valid
     :return: Presigned URL as string. If error, returns None.
     """
 
     # Generate a presigned URL for the S3 object
     s3_client = boto3.client("s3", region_name=region_name)
+    params = {
+        "Bucket": bucket_name,
+        "Key": object_name,
+        "ContentType": object_type,
+    }
+    logger.info(f"Params: {params}")
     try:
         response = s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": bucket_name, "Key": object_name},
+            "put_object",
+            Params=params,
             ExpiresIn=expiration,
+            HttpMethod="PUT",
         )
     except ClientError as e:
         logger.exceptions(e)
