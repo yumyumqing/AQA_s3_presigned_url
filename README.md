@@ -19,7 +19,7 @@ Important: this application uses various AWS services and there are costs associ
 
 * AWS CLI already configured with Administrator permission
 * [AWS SAM CLI installed](https://docs.aws.amazon.com/serverless-application-model/latest/developerguide/serverless-sam-cli-install.html) - minimum version 0.48.
-* [NodeJS 12.x installed](https://nodejs.org/en/download/)
+* python3.8
 
 ## Installation Instructions
 
@@ -37,9 +37,12 @@ sam deploy --guided
 ```
 
 When prompted for parameters, enter:
-- Stack Name: s3Uploader
-- AWS Region: your preferred AWS Region (e.g. us-east-1)
-- Accept all other defaults.
+- Stack Name: AQAUploadProcess
+- AWS Region: us-west-2
+- Accept all other defaults. Except:
+```
+UploadRequestFunction may not have authorization defined, Is this okay? [y/N]: y
+```
 
 This takes several minutes to deploy. At the end of the deployment, note the output values, as you need these later.
 
@@ -52,8 +55,9 @@ This takes several minutes to deploy. At the end of the deployment, note the out
    https://glxlp92kil.execute-api.us-west-2.amazonaws.com/uploads
 2. In the Postman interface, paste the API endpoint into the box labeled Enter request URL, select GET, add video as binary raw file.
 3. Send
+4. (For uploading a file to S3) In the Postman interface, open another tab, paste the presigned URL get from step 3, select PUT, add the same video as binary raw file as in step 2, send
 
-### Testing with the frontend application
+### Testing with the frontend application (THIS IS FROM THE ORIGINAL REPO AT THE TOP, NOT WORKING FOR THIS REPO)
 
 The frontend code is saved in the `frontend` subdirectory. 
 
