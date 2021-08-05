@@ -1,9 +1,26 @@
 AWSTemplateFormatVersion: 2010-09-09
 Transform: AWS::Serverless-2016-10-31
-Description: S3 Uploader - sample application
+Description: AQA application - prediction score on user uploaded videos
 
 Resources:
-  # HTTP API
+  ## S3 bucket - for storing user uploaded videos
+  # this S3 bucket has a trigger to S3TriggerFunction manually setup through console
+  # TODO: haven't figured out how to set it up in cloudformation template
+  S3UploadBucket:
+    Type: AWS::S3::Bucket
+    Properties:
+      CorsConfiguration:
+        CorsRules:
+        - AllowedHeaders:
+            - "*"
+          AllowedMethods:
+            - GET
+            - PUT
+            - HEAD
+          AllowedOrigins:
+            - "*"
+
+  ## HTTP API - get user uploaded videos basic info
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -16,11 +33,14 @@ Resources:
           - DELETE
           - OPTIONS
         AllowHeaders:
-          - "*"   
+          - "*"
         AllowOrigins: 
           - "*"      
 
   ## Lambda functions
+  # UploadRequestFunction -
+  # when receiving a GET request from MyApi, generate a presigned URL to put-object in S3 
+  # for later PUT request to use
   UploadRequestFunction:
     # More info about Function Resource: https://github.com/awslabs/serverless-application-model/blob/master/versions/2016-10-31.md#awsserverlessfunction
     Type: AWS::Serverless::Function 
@@ -50,28 +70,51 @@ Resources:
             Path: /uploads
             Method: get
             ApiId: !Ref MyApi  
-
-  ## S3 bucket
-  S3UploadBucket:
-    Type: AWS::S3::Bucket
+  
+  # ProcessPredictFunction -
+  # triggered by S3 object creation event (trigger is setup manually through console for now)
+  # TODO: download object from S3, process the video and make prediction
+  ProcessPredictFunction:
+    Type: 'AWS::Serverless::Function'
     Properties:
-      CorsConfiguration:
-        CorsRules:
-        - AllowedHeaders:
-            - "*"
-          AllowedMethods:
-            - GET
-            - PUT
-            - HEAD
-          AllowedOrigins:
-            - "*"
+      Handler: process.handler
+      Runtime: python3.8
+      CodeUri: getPredScore/
+      Description: >-
+        An Amazon S3 trigger that retrieves metadata for the object that has
+        been updated, download the object and make prediction score
+      MemorySize: 128
+      Timeout: 3
+      Policies:
+        - AmazonS3ReadOnlyAccess
+      Events:
+        BucketEvent1:
+          Type: S3
+          Properties:
+            Bucket: !Ref S3UploadBucket
+            Events:
+              - 's3:ObjectCreated:*'
+
+  
 
 ## Take a note of the outputs for deploying the workflow templates in this sample application
 Outputs:
-  APIendpoint:
-    Description: "HTTP API endpoint URL"
-    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com"
+  UploadAssetAPI:
+    Description: "HTTP API endpoint URL to get pre-signed URL for uploads"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/uploads"
   S3UploadBucketName:
     Description: "S3 bucket for application uploads"
-    Value: !Ref 'S3UploadBucket'    
+    Value: !Ref 'S3UploadBucket'
+  UploadRequestFunction:
+    Description: "UploadRequest Lambda Function ARN"
+    Value: !GetAtt UploadRequestFunction.Arn
+  UploadRequestFunctionIamRole:
+    Description: "Implicit IAM Role created for UploadRequest function"
+    Value: !GetAtt UploadRequestFunctionRole.Arn
+  ProcessPredictFunction:
+    Description: "ProcessPredict Lambda Function ARN"
+    Value: !GetAtt ProcessPredictFunction.Arn
+  ProcessPredictFunctionIamRole:
+    Description: "Implicit IAM Role created for ProcessPredict function"
+    Value: !GetAtt ProcessPredictFunctionRole.Arn
 
