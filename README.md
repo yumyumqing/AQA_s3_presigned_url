@@ -4,6 +4,10 @@ This repo is based on https://github.com/aws-samples/amazon-s3-presigned-urls-aw
 
 This example application shows how to upload objects to S3 directly from your end-user application using Signed URLs.
 
+# Added
+
+Also added a S3 trigger lambda function that executes whenever an object is created in the S3 bucket.
+
 To learn more about how this application works, see the AWS Compute Blog post: https://aws.amazon.com/blogs/compute/uploading-to-amazon-s3-directly-from-a-web-or-mobile-application/
 
 Important: this application uses various AWS services and there are costs associated with these services after the Free Tier usage - please see the [AWS Pricing page](https://aws.amazon.com/pricing/) for details. You are responsible for any AWS costs incurred. No warranty is implied in this example.
@@ -12,7 +16,8 @@ Important: this application uses various AWS services and there are costs associ
 .
 ├── README.MD                   <-- This instructions file
 ├── frontend                    <-- Simple JavaScript application illustrating upload
-├── getSignedURL                <-- Source code for the serverless backend
+├── getSignedURL                <-- Source code for the serverless backend to get a presigned URL for upload
+├── getPredScore                <-- Source code for the serverless backend to download object from S3 and process
 ```
 
 ## Requirements
