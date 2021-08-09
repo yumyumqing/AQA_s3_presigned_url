@@ -7,3 +7,4 @@ s3_bucket = "aws-sam-cli-managed-default-samclisourcebucket-12xtmy2749plc"
 s3_prefix = "AQAUploadProcess"
 region = "us-west-2"
 capabilities = "CAPABILITY_IAM"
+image_repositories = ["ProcessPredictFunction=724670356997.dkr.ecr.us-west-2.amazonaws.com/processpredict"]

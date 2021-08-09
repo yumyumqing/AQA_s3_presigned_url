@@ -4,8 +4,6 @@ Description: AQA application - prediction score on user uploaded videos
 
 Resources:
   ## S3 bucket - for storing user uploaded videos
-  # this S3 bucket has a trigger to S3TriggerFunction manually setup through console
-  # TODO: haven't figured out how to set it up in cloudformation template
   S3UploadBucket:
     Type: AWS::S3::Bucket
     Properties:
@@ -47,7 +45,7 @@ Resources:
     Properties:
       CodeUri: getSignedURL/
       Handler: app.handler
-      Runtime: python3.8
+      Runtime: python3.7
       Timeout: 3
       MemorySize: 128
       Environment:
@@ -72,19 +70,18 @@ Resources:
             ApiId: !Ref MyApi  
   
   # ProcessPredictFunction -
-  # triggered by S3 object creation event (trigger is setup manually through console for now)
+  # triggered by S3 object creation event
   # TODO: download object from S3, process the video and make prediction
   ProcessPredictFunction:
     Type: 'AWS::Serverless::Function'
     Properties:
-      Handler: process.handler
-      Runtime: python3.8
+      PackageType: Image
       CodeUri: getPredScore/
       Description: >-
         An Amazon S3 trigger that retrieves metadata for the object that has
         been updated, download the object and make prediction score
-      MemorySize: 128
-      Timeout: 3
+      Timeout: 600
+      MemorySize: 4096
       Policies:
         - AmazonS3ReadOnlyAccess
       Events:
@@ -94,7 +91,10 @@ Resources:
             Bucket: !Ref S3UploadBucket
             Events:
               - 's3:ObjectCreated:*'
-
+    Metadata:
+      Dockerfile: Dockerfile
+      DockerContext: ./getPredScore
+      DockerTag: python3.7-v1
   
 
 ## Take a note of the outputs for deploying the workflow templates in this sample application
