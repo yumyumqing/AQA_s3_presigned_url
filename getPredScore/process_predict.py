@@ -91,17 +91,20 @@ def make_prediction(video_file_path):
 
 # Write prediction score to DynamoDB aqa_results table
 def write_result(video_name, video_score):
+    video_name_wo_ext = video_name.split(".")[0]
+    table_name = "aqa_scores"
+    logger.info(f"Putting item [{video_name_wo_ext}] into table [{table_name}] ...")
     response = db.put_item(
     Item={
-        'name': {
-            'S': video_name,
+        'videoName': {
+            'S': video_name_wo_ext,
         },
-        'score': {
+        'videoScore': {
             'N': f"{video_score}",
         },
     },
     ReturnConsumedCapacity='TOTAL',
-    TableName='aqa_results',
+    TableName=table_name,
     )
     logger.info("DB write response: {}".format(response))
 
