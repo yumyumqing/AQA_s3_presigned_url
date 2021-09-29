@@ -84,6 +84,7 @@ Resources:
       MemorySize: 4096
       Policies:
         - AmazonS3ReadOnlyAccess
+        - AmazonDynamoDBFullAccess
       Events:
         BucketEvent1:
           Type: S3

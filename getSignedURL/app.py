@@ -16,13 +16,14 @@ logger.setLevel(logging.INFO)
 
 def handler(event, context):
     try:
+        logger.info(event["headers"])
         # Create a unique key for user-uploaded video
         video_id = dt.utcnow().strftime("%Y%m%d_%H%M%S_%f")
         video_type = event["headers"]["content-type"]
         logger.info(f"Upload video type: {video_type}")
         if "quicktime" in video_type:
             video_ext = "mov"
-        elif "x-msvideo" in video_type:
+        elif "x-msvideo" in video_type or "avi" in video_type:
             video_ext = "avi"
         else:
             video_ext = "mp4"

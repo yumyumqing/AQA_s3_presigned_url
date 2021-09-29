@@ -44,6 +44,7 @@ transform = transforms.Compose(
 )
 
 s3 = boto3.client("s3")
+db = boto3.client("dynamodb")
 
 
 # Lambda handler executed by lambda function
@@ -67,6 +68,7 @@ def handler(event, context):
         s3.download_file(bucket, key, temp_video_path)
         pred_score = make_prediction(temp_video_path)
         logger.info(f"=== Prediction score: {pred_score} ===")
+        write_result(key, pred_score)
         return pred_score
     except Exception as e:
         print(e)
@@ -87,6 +89,21 @@ def make_prediction(video_file_path):
         logger.info("Predicted score: {}".format(val))
     return val
 
+# Write prediction score to DynamoDB aqa_results table
+def write_result(video_name, video_score):
+    response = db.put_item(
+    Item={
+        'name': {
+            'S': video_name,
+        },
+        'score': {
+            'N': f"{video_score}",
+        },
+    },
+    ReturnConsumedCapacity='TOTAL',
+    TableName='aqa_results',
+    )
+    logger.info("DB write response: {}".format(response))
 
 ## Helper functions for processing a video and making prediction
 def center_crop(img, dim):
