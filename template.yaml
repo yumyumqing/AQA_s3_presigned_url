@@ -18,7 +18,7 @@ Resources:
           AllowedOrigins:
             - "*"
 
-  ## HTTP API - get user uploaded videos basic info
+  ## HTTP API - for user uploading video and fetching score
   MyApi:
     Type: AWS::Serverless::HttpApi
     Properties:
@@ -96,6 +96,26 @@ Resources:
       Dockerfile: Dockerfile
       DockerContext: ./getPredScore
       DockerTag: python3.7-v1
+
+  # NotifyScoreFunction -
+  # check if videoName/videoScore item is present in DynamoDB table and respond with score or status
+  FetchScoreFunction:
+    Type: AWS::Serverless::Function 
+    Properties:
+      CodeUri: fetchScore/
+      Handler: app.handler
+      Runtime: python3.7
+      Timeout: 3
+      MemorySize: 128
+      Policies:
+        - AmazonDynamoDBReadOnlyAccess
+      Events:
+        FetchScoreAPI:
+          Type: HttpApi
+          Properties:
+            Path: /fetch
+            Method: get
+            ApiId: !Ref MyApi  
   
 
 ## Take a note of the outputs for deploying the workflow templates in this sample application
@@ -103,6 +123,9 @@ Outputs:
   UploadAssetAPI:
     Description: "HTTP API endpoint URL to get pre-signed URL for uploads"
     Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/uploads"
+  FetchScoreAPI:
+    Description: "HTTP API endpoint URL to fetch score for uploaded video from DynamoDB table"
+    Value: !Sub "https://${MyApi}.execute-api.${AWS::Region}.amazonaws.com/fetch"
   S3UploadBucketName:
     Description: "S3 bucket for application uploads"
     Value: !Ref 'S3UploadBucket'
@@ -112,6 +135,12 @@ Outputs:
   UploadRequestFunctionIamRole:
     Description: "Implicit IAM Role created for UploadRequest function"
     Value: !GetAtt UploadRequestFunctionRole.Arn
+  FetchScoreFunction:
+    Description: "FetchScore Lambda Function ARN"
+    Value: !GetAtt FetchScoreFunction.Arn
+  FetchScoreFunctionIamRole:
+    Description: "Implicit IAM Role created for FetchScore function"
+    Value: !GetAtt FetchScoreFunctionRole.Arn
   ProcessPredictFunction:
     Description: "ProcessPredict Lambda Function ARN"
     Value: !GetAtt ProcessPredictFunction.Arn
