@@ -16,6 +16,7 @@ Important: this application uses various AWS services and there are costs associ
 .
 ├── README.MD                   <-- This instructions file
 ├── frontend                    <-- Simple JavaScript application illustrating upload
+├── fetchScore                  <-- Source code for the serverless backend to fetch an item from DynamoDB table which stores the scores for uploaded videos
 ├── getSignedURL                <-- Source code for the serverless backend to get a presigned URL for upload
 ├── getPredScore                <-- Source code for the serverless backend to download object from S3 and process
 ```
