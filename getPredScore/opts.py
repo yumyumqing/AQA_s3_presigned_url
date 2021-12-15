@@ -11,12 +11,6 @@ m3_path = 'models/model_score_regressor_94.pth'
 m4_path = 'models/model_dive_classifier_94.pth'
 c3d_path = 'models/c3d.pickle'
 
-# m1_path = '/tmp/model_CNN_94.pth'
-# m2_path = '/tmp/model_my_fc6_94.pth'
-# m3_path = '/tmp/model_score_regressor_94.pth'
-# m4_path = '/tmp/model_dive_classifier_94.pth'
-# c3d_path = '/tmp/c3d.pickle'
-
 with_dive_classification = False
 with_caption = False
 
